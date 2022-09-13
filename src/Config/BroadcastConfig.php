@@ -11,7 +11,7 @@ final class BroadcastConfig extends InjectableConfig
 {
     public const CONFIG = 'broadcasting';
 
-    protected $config = [
+    protected array $config = [
         'authorize' => [
             'path' => null,
             'topics' => [],
@@ -53,7 +53,7 @@ final class BroadcastConfig extends InjectableConfig
      */
     public function getDefaultConnection(): string
     {
-        if (!isset($this->config['default']) || empty($this->config['default'])) {
+        if (empty($this->config['default'])) {
             throw new InvalidArgumentException('Default broadcast connection is not defined.');
         }
 
@@ -68,7 +68,7 @@ final class BroadcastConfig extends InjectableConfig
     {
         if (!isset($this->config['connections'][$name])) {
             throw new InvalidArgumentException(
-                sprintf('Config for connection `%s` is not defined.', $name)
+                \sprintf('Config for connection `%s` is not defined.', $name)
             );
         }
 
@@ -76,7 +76,7 @@ final class BroadcastConfig extends InjectableConfig
 
         if (!isset($config['driver'])) {
             throw new InvalidArgumentException(
-                sprintf('Driver for `%s` connection is not defined.', $name)
+                \sprintf('Driver for `%s` connection is not defined.', $name)
             );
         }
 

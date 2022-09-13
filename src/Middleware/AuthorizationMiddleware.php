@@ -4,28 +4,25 @@ declare(strict_types=1);
 
 namespace Spiral\Broadcasting\Middleware;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Spiral\Broadcasting\AuthorizationStatus;
 use Spiral\Broadcasting\BroadcastInterface;
+use Spiral\Broadcasting\Event\Authorized;
 use Spiral\Broadcasting\GuardInterface;
 
 final class AuthorizationMiddleware implements MiddlewareInterface
 {
-    private ResponseFactoryInterface $responseFactory;
-    private BroadcastInterface $broadcast;
-    private ?string $authorizationPath;
-
     public function __construct(
-        BroadcastInterface $broadcast,
-        ResponseFactoryInterface $responseFactory,
-        ?string $authorizationPath = null
+        private readonly BroadcastInterface $broadcast,
+        private readonly ResponseFactoryInterface $responseFactory,
+        private readonly ?string $authorizationPath = null,
+        private readonly ?EventDispatcherInterface $dispatcher = null
     ) {
-        $this->responseFactory = $responseFactory;
-        $this->broadcast = $broadcast;
-        $this->authorizationPath = $authorizationPath;
     }
 
     public function process(
@@ -38,14 +35,21 @@ final class AuthorizationMiddleware implements MiddlewareInterface
 
         if ($this->broadcast instanceof GuardInterface) {
             $status = $this->broadcast->authorize($request);
+        } else {
+            $status = new AuthorizationStatus(
+                success: true,
+                topics: null
+            );
+        }
 
-            if ($status->hasResponse()) {
-                return $status->getResponse();
-            }
+        $this->dispatcher?->dispatch(new Authorized($status, $request));
 
-            if (!$status->isSuccessful()) {
-                return $this->responseFactory->createResponse(403);
-            }
+        if ($status->response !== null) {
+            return $status->response;
+        }
+
+        if (!$status->success) {
+            return $this->responseFactory->createResponse(403);
         }
 
         return $this->responseFactory->createResponse(200);
