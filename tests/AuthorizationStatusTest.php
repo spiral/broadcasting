@@ -14,29 +14,29 @@ final class AuthorizationStatusTest extends TestCase
     public function testIsSuccessful(): void
     {
         $false = new AuthorizationStatus(false, []);
-        self::assertFalse($false->success);
+        $this->assertFalse($false->success);
 
         $true = new AuthorizationStatus(true, []);
-        self::assertTrue($true->success);
+        $this->assertTrue($true->success);
     }
 
     public function testGetsTopics(): void
     {
         $status = new AuthorizationStatus(false, $topics = ['topic1', 'topic2']);
-        self::assertSame($topics, $status->topics);
+        $this->assertSame($topics, $status->topics);
     }
 
     public function testGetsAttributes(): void
     {
         $status = new AuthorizationStatus(false, ['topic1'], $attributes = ['foo' => 'bar']);
-        self::assertSame($attributes, $status->attributes);
+        $this->assertSame($attributes, $status->attributes);
     }
 
     public function testGetsNullResponse(): void
     {
         $status = new AuthorizationStatus(false, ['topic1'], ['foo' => 'bar']);
-        self::assertNull($status->response);
-        self::assertFalse($status->hasResponse());
+        $this->assertNull($status->response);
+        $this->assertFalse($status->hasResponse());
     }
 
     public function testGetsResponse(): void
@@ -48,28 +48,28 @@ final class AuthorizationStatusTest extends TestCase
             $response = m::mock(ResponseInterface::class)
         );
 
-        self::assertSame($response, $status->response);
-        self::assertTrue($status->hasResponse());
+        $this->assertSame($response, $status->response);
+        $this->assertTrue($status->hasResponse());
     }
 
     public function testWith(): void
     {
         $status = new AuthorizationStatus(success: false, topics: null);
 
-        self::assertNull($status->response);
+        $this->assertNull($status->response);
         $newStatus = $status->with(response: $response = m::mock(ResponseInterface::class));
-        self::assertSame($response, $newStatus->response);
+        $this->assertSame($response, $newStatus->response);
 
-        self::assertFalse($status->success);
+        $this->assertFalse($status->success);
         $newStatus = $status->with(success: true);
-        self::assertTrue($newStatus->success);
+        $this->assertTrue($newStatus->success);
 
-        self::assertNull($status->topics);
+        $this->assertNull($status->topics);
         $newStatus = $status->with(topics: $topics = ['foo', 'bar']);
-        self::assertSame($topics, $newStatus->topics);
+        $this->assertSame($topics, $newStatus->topics);
 
-        self::assertSame([], $status->attributes);
+        $this->assertSame([], $status->attributes);
         $newStatus = $status->with(attributes: $attributes = ['foo', 'bar']);
-        self::assertSame($attributes, $newStatus->attributes);
+        $this->assertSame($attributes, $newStatus->attributes);
     }
 }

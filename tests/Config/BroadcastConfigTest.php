@@ -20,8 +20,8 @@ final class BroadcastConfigTest extends TestCase
             'authorize' => [
                 'path' => 'foo-path',
                 'topics' => [
-                    'bar-topic.{id}' => static fn (mixed $id): mixed => $id,
-                    'foo-topic' => static fn (): string => 'foo',
+                    'bar-topic.{id}' => fn ($id) => $id,
+                    'foo-topic' => fn () => 'foo',
                 ],
             ],
             'default' => 'firebase',
@@ -49,21 +49,30 @@ final class BroadcastConfigTest extends TestCase
 
     public function testGetsDefaultConnection(): void
     {
-        self::assertSame('firebase', $this->config->getDefaultConnection());
+        $this->assertSame(
+            'firebase',
+            $this->config->getDefaultConnection()
+        );
     }
 
     public function testGetsConnectionConfigByName(): void
     {
-        self::assertSame([
-            'driver' => 'null-driver',
-        ], $this->config->getConnectionConfig('null'));
+        $this->assertSame(
+            [
+                'driver' => 'null-driver',
+            ],
+            $this->config->getConnectionConfig('null')
+        );
     }
 
     public function testGetsConnectionWithAliasDriverShouldBeReplacedWithRealDriver(): void
     {
-        self::assertSame([
-            'driver' => 'log-driver',
-        ], $this->config->getConnectionConfig('firebase'));
+        $this->assertSame(
+            [
+                'driver' => 'log-driver',
+            ],
+            $this->config->getConnectionConfig('firebase')
+        );
     }
 
     public function testNotDefinedConnectionShouldThrowAnException(): void
@@ -84,17 +93,20 @@ final class BroadcastConfigTest extends TestCase
 
     public function testGetAuthorizationPath(): void
     {
-        self::assertSame('foo-path', $this->config->getAuthorizationPath());
+        $this->assertSame('foo-path', $this->config->getAuthorizationPath());
     }
 
     public function testNotDefinedAuthorizationPathShouldReturnNull(): void
     {
         $config = new BroadcastConfig();
-        self::assertNull($config->getAuthorizationPath());
+        $this->assertNull($config->getAuthorizationPath());
     }
 
     public function testGetsTopics(): void
     {
-        self::assertSame($this->config['authorize']['topics'], $this->config->getTopics());
+        $this->assertSame(
+            $this->config['authorize']['topics'],
+            $this->config->getTopics()
+        );
     }
 }
