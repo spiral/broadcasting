@@ -12,57 +12,6 @@ final class BroadcastConfigTest extends TestCase
 {
     private BroadcastConfig $config;
 
-    public function testGetsDefaultConnection(): void
-    {
-        self::assertSame('firebase', $this->config->getDefaultConnection());
-    }
-
-    public function testGetsConnectionConfigByName(): void
-    {
-        self::assertSame([
-            'driver' => 'null-driver',
-        ], $this->config->getConnectionConfig('null'));
-    }
-
-    public function testGetsConnectionWithAliasDriverShouldBeReplacedWithRealDriver(): void
-    {
-        self::assertSame([
-            'driver' => 'log-driver',
-        ], $this->config->getConnectionConfig('firebase'));
-    }
-
-    public function testNotDefinedConnectionShouldThrowAnException(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Config for connection `foo` is not defined.');
-
-        $this->config->getConnectionConfig('foo');
-    }
-
-    public function testConnectionWithoutDefinedDriverShouldThrowAnException(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Driver for `memory` connection is not defined.');
-
-        $this->config->getConnectionConfig('memory');
-    }
-
-    public function testGetAuthorizationPath(): void
-    {
-        self::assertSame('foo-path', $this->config->getAuthorizationPath());
-    }
-
-    public function testNotDefinedAuthorizationPathShouldReturnNull(): void
-    {
-        $config = new BroadcastConfig();
-        self::assertNull($config->getAuthorizationPath());
-    }
-
-    public function testGetsTopics(): void
-    {
-        self::assertSame($this->config['authorize']['topics'], $this->config->getTopics());
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -71,8 +20,8 @@ final class BroadcastConfigTest extends TestCase
             'authorize' => [
                 'path' => 'foo-path',
                 'topics' => [
-                    'bar-topic.{id}' => static fn(mixed $id): mixed => $id,
-                    'foo-topic' => static fn(): string => 'foo',
+                    'bar-topic.{id}' => fn ($id) => $id,
+                    'foo-topic' => fn () => 'foo',
                 ],
             ],
             'default' => 'firebase',
@@ -95,5 +44,69 @@ final class BroadcastConfigTest extends TestCase
                 'memory' => [],
             ],
         ]);
+    }
+
+
+    public function testGetsDefaultConnection(): void
+    {
+        $this->assertSame(
+            'firebase',
+            $this->config->getDefaultConnection()
+        );
+    }
+
+    public function testGetsConnectionConfigByName(): void
+    {
+        $this->assertSame(
+            [
+                'driver' => 'null-driver',
+            ],
+            $this->config->getConnectionConfig('null')
+        );
+    }
+
+    public function testGetsConnectionWithAliasDriverShouldBeReplacedWithRealDriver(): void
+    {
+        $this->assertSame(
+            [
+                'driver' => 'log-driver',
+            ],
+            $this->config->getConnectionConfig('firebase')
+        );
+    }
+
+    public function testNotDefinedConnectionShouldThrowAnException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Config for connection `foo` is not defined.');
+
+        $this->config->getConnectionConfig('foo');
+    }
+
+    public function testConnectionWithoutDefinedDriverShouldThrowAnException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Driver for `memory` connection is not defined.');
+
+        $this->config->getConnectionConfig('memory');
+    }
+
+    public function testGetAuthorizationPath(): void
+    {
+        $this->assertSame('foo-path', $this->config->getAuthorizationPath());
+    }
+
+    public function testNotDefinedAuthorizationPathShouldReturnNull(): void
+    {
+        $config = new BroadcastConfig();
+        $this->assertNull($config->getAuthorizationPath());
+    }
+
+    public function testGetsTopics(): void
+    {
+        $this->assertSame(
+            $this->config['authorize']['topics'],
+            $this->config->getTopics()
+        );
     }
 }

@@ -16,8 +16,9 @@ final class BroadcastManager implements BroadcastManagerInterface
 
     public function __construct(
         private readonly FactoryInterface $factory,
-        private readonly BroadcastConfig $config,
-    ) {}
+        private readonly BroadcastConfig $config
+    ) {
+    }
 
     public function connection(?string $name = null): BroadcastInterface
     {

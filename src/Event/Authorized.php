@@ -11,6 +11,7 @@ final class Authorized
 {
     public function __construct(
         public AuthorizationStatus $status,
-        public readonly ServerRequestInterface $request,
-    ) {}
+        public readonly ServerRequestInterface $request
+    ) {
+    }
 }

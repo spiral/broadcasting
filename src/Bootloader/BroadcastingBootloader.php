@@ -26,14 +26,15 @@ final class BroadcastingBootloader extends Bootloader
     ];
 
     public function __construct(
-        private readonly ConfiguratorInterface $config,
-    ) {}
+        private readonly ConfiguratorInterface $config
+    ) {
+    }
 
     public function registerDriverAlias(string $driverClass, string $alias): void
     {
         $this->config->modify(
             BroadcastConfig::CONFIG,
-            new Append('driverAliases', $alias, $driverClass),
+            new Append('driverAliases', $alias, $driverClass)
         );
     }
 
@@ -62,7 +63,7 @@ final class BroadcastingBootloader extends Bootloader
                     'null' => NullBroadcast::class,
                     'log' => LogBroadcast::class,
                 ],
-            ],
+            ]
         );
     }
 
